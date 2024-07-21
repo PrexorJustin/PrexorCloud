@@ -1,0 +1,5 @@
+main: me.prexorjustin.prexornetwork.cloud.api.bootstrap.bungee.BungeeBootstrap
+name: PrexorCloudAPI
+version: 1.0
+author: PrexorJustin
+load: STARTUP
