@@ -4,7 +4,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.dummys.rest.GeneralConfig;
-import me.prexorjustin.prexornetwork.cloud.driver.configuration.dummys.rest.ModuleConfig;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.dummys.rest.SoftwareConfig;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.rest.RestAPIEndpoints;
 
@@ -15,8 +14,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @NoArgsConstructor
@@ -27,20 +26,15 @@ public final class PacketLoader {
     @SneakyThrows
     public void loadCloudAPI() {
         GeneralConfig updateConfig = (GeneralConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.GENERAL), GeneralConfig.class);
-        downloadFile(updateConfig.getConfig().get("cloud-api"), "./local/GLOBAL/EVERY/plugins/prexorcloud-api.jar");
+        String url = updateConfig.getConfig().get("cloud-api");
+        System.out.println(url);
+        downloadFile(url, "./local/GLOBAL/EVERY/plugins/prexorcloud-api.jar");
     }
 
     @SneakyThrows
     public void loadCloudPlugin() {
         GeneralConfig updateConfig = (GeneralConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.GENERAL), GeneralConfig.class);
         downloadFile(updateConfig.getConfig().get("cloud-plugin"), "./local/GLOBAL/EVERY/plugins/prexorcloud-plugin.jar");
-    }
-
-    @SneakyThrows
-    public void loadModules() {
-        ModuleConfig moduleConfig = (ModuleConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.MODULES), ModuleConfig.class);
-        if (moduleConfig.getModules().isEmpty()) return;
-        moduleConfig.getModules().forEach((key, url) -> downloadFile(url, "./modules/prexorcloud-" + key + ".jar"));
     }
 
     public List<String> getAvailableBungeecords() {
@@ -57,12 +51,12 @@ public final class PacketLoader {
 
     public void loadBungeecord(String bungeecordVersion, String groupName) {
         SoftwareConfig softwareConfig = (SoftwareConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.SOFTWARE), SoftwareConfig.class);
-        downloadFile(softwareConfig.getProxies().get(bungeecordVersion.toUpperCase()), "./local/templates/" + groupName + "/" + "server" + ".jar");
+        downloadFile(softwareConfig.getProxies().get(bungeecordVersion.toUpperCase()), "./local/templates/" + groupName + "/server.jar");
     }
 
     public void loadSpigot(String spigotVersion, String groupName) {
         SoftwareConfig softwareConfig = (SoftwareConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.SOFTWARE), SoftwareConfig.class);
-        downloadFile(softwareConfig.getSpigots().get(spigotVersion.toUpperCase()), "./local/templates/" + groupName + "/" + "server" + ".jar");
+        downloadFile(softwareConfig.getSpigots().get(spigotVersion.toUpperCase()), "./local/templates/" + groupName + "/server.jar");
     }
 
     @SneakyThrows
@@ -79,7 +73,9 @@ public final class PacketLoader {
         HttpResponse<InputStream> downloadAPIResponse = this.client.send(downloadAPIRequest, HttpResponse.BodyHandlers.ofInputStream());
 
         try (InputStream stream = downloadAPIResponse.body()) {
-            Files.write(Paths.get(destination), stream.readAllBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Path destinationPath = Paths.get(destination);
+            Files.createDirectories(destinationPath.getParent());
+            Files.write(destinationPath, stream.readAllBytes());
         }
     }
 }

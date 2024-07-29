@@ -12,6 +12,7 @@ public enum Type {
     EMPTY,
     NETWORK,
     DEBUG,
-    MODULE
+    MODULE,
+    SERVICE
 
 }

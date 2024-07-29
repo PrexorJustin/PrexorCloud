@@ -12,6 +12,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.storage.ModuleStorage;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.TerminalDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.enums.Type;
 import me.prexorjustin.prexornetwork.cloud.launcher.loader.InstanceLoader;
+import me.prexorjustin.prexornetwork.cloud.launcher.loader.InstanceLoaderTest;
 import me.prexorjustin.prexornetwork.cloud.launcher.update.AutoUpdater;
 
 import java.io.File;
@@ -144,6 +145,7 @@ public class PrexorCloudBoot {
                 HttpResponse<InputStream> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
                 try (InputStream body = response.body()) {
+                    Files.createDirectories(Paths.get("./dependency/runnable-manager.jar").getParent());
                     Files.write(Paths.get("./dependency/runnable-manager.jar"), body.readAllBytes());
                 }
             } else {
@@ -174,9 +176,9 @@ public class PrexorCloudBoot {
         }
 
         if (Files.exists(Paths.get("./service.json")))
-            InstanceLoader.loadInstance(new File("./dependency/runnable-manager.jar"));
+            new InstanceLoader(new File("./dependency/runnable-manager.jar"));
         else
-            InstanceLoader.loadInstance(new File("./dependency/runnable-node.jar"));
+            InstanceLoaderTest.loadInstance(new File("./dependency/runnable-node.jar"));
     }
 
     private static void waitForFinishedSetup() {

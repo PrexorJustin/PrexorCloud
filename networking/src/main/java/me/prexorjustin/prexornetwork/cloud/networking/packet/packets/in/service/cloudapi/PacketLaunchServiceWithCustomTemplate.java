@@ -1,9 +1,11 @@
 package me.prexorjustin.prexornetwork.cloud.networking.packet.packets.in.service.cloudapi;
 
+import lombok.Getter;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.NettyBuffer;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.Packet;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class PacketLaunchServiceWithCustomTemplate extends Packet {
 
     private String group, template;

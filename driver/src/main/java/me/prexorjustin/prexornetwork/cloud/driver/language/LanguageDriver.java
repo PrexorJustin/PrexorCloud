@@ -49,9 +49,9 @@ public class LanguageDriver {
             LanguageConfig languageConfig = (LanguageConfig) new ConfigDriver("./local/storage/messages.storage").read(LanguageConfig.class);
             this.language.update(languageConfig.getMessages());
         } else {
-            HttpRequest request = HttpRequest.newBuilder(URI.create("http://84.247.173.227/cloud/languages/" + Driver.getInstance().getMessageStorage().getLanguage().toUpperCase() + ".json")).GET().build();
+            String uri = "http://84.247.173.227/cloud/languages/" + Driver.getInstance().getMessageStorage().getLanguage().toUpperCase() + ".json";
+            HttpRequest request = HttpRequest.newBuilder(URI.create(uri)).GET().build();
             HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-
             this.language.update(this.objectMapper.readValue(response.body(), HashMap.class));
         }
     }

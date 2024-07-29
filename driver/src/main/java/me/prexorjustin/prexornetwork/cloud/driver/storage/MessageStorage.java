@@ -23,8 +23,10 @@ import java.util.LinkedList;
 public class MessageStorage {
 
     private final String version = "1.0";
-    private final Integer canUseMemory;
-    private final boolean shutdownAccept;
+    @Setter
+    private Integer canUseMemory;
+    @Setter
+    private boolean shutdownAccept;
     private final PacketLoader packetLoader;
     @Setter
     private EventDriver eventDriver;
@@ -62,7 +64,7 @@ public class MessageStorage {
 
     public String[] dropFirstString(String[] input) {
         String[] string = new String[input.length - 1];
-        System.arraycopy(input, 1, string, 0, string.length - 1);
+        System.arraycopy(input, 1, string, 0, input.length - 1);
         return string;
     }
 

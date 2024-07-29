@@ -7,6 +7,7 @@ import me.prexorjustin.prexornetwork.cloud.api.CloudAPI;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.group.dummys.Group;
 import me.prexorjustin.prexornetwork.cloud.driver.process.ServiceState;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.liveservice.LiveServiceList;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.liveservice.LiveServices;
 
@@ -23,7 +24,7 @@ public abstract class ICloudService {
     public abstract int getPlayerCount();
 
     public String getID() {
-        LiveServiceList liveServiceList = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudservice/general"), LiveServiceList.class);
+        LiveServiceList liveServiceList = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), LiveServiceList.class);
 
         return getName().replace(getGroupName(), "").replace(liveServiceList.getCloudServiceSplitter(), "");
     }
@@ -57,8 +58,8 @@ public abstract class ICloudService {
     }
 
     private LiveServices getLiveServices() {
-        LiveServiceList list = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudservice/general"), LiveServiceList.class);
-        return (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudservice/" + getName().replace(list.getCloudServiceSplitter(), "~")), LiveServices.class);
+        LiveServiceList list = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()"), LiveServiceList.class);
+        return (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", getName().replace(list.getCloudServiceSplitter(), "~"))), LiveServices.class);
     }
 
     public String toString() {

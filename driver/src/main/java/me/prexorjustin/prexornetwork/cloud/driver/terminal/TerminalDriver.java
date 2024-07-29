@@ -26,8 +26,8 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp;
 
+import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -43,7 +43,7 @@ public class TerminalDriver {
     private final SetupDriver setupDriver;
     private final CommandDriver commandDriver;
 
-    private final Terminal terminal;
+    private final Terminal terminal = TerminalBuilder.terminal();
     private final LineReader lineReader;
     private final SimpleLatestLog simpleLatestLog;
 
@@ -52,25 +52,18 @@ public class TerminalDriver {
     private boolean inSetup;
 
     @SneakyThrows
-    public TerminalDriver() {
+    public TerminalDriver() throws IOException {
         System.setOut(new PrintStream(new LoggerOutputStream(Type.INFO), true));
         System.setErr(new PrintStream(new LoggerOutputStream(Type.ERROR), true));
 
         this.commandDriver = new CommandDriver();
         this.setupDriver = new SetupDriver();
-
         this.mainScreenStorage = new LinkedList<>();
         this.inputs = new LinkedList<>();
-
         this.simpleLatestLog = new SimpleLatestLog();
-
         this.inSetup = false;
 
-        this.terminal = TerminalBuilder.builder()
-                .system(true)
-                .encoding(StandardCharsets.UTF_8)
-                .name("PREXOR-CONSOLE")
-                .build();
+        //this.terminal = TerminalBuilder.terminal();
 
         this.lineReader = LineReaderBuilder.builder()
                 .terminal(this.terminal)

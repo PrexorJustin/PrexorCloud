@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -174,7 +175,7 @@ public class ManagerSetup extends SetupClass {
                                 managerConfig.setBungeePort(25565);
                                 managerConfig.setSpigotPort(5000);
                                 managerConfig.setAutoUpdate((Boolean) getAnswers().get("updater"));
-                                managerConfig.setWhitelist(new ArrayList<>());
+                                managerConfig.setWhitelist(new HashSet<>());
 
                                 ArrayList<ManagerConfigNodes> nodes = new ArrayList<>();
                                 nodes.add(managerConfigNodes);

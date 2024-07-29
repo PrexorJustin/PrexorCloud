@@ -11,7 +11,6 @@ public class PacketOutCloudPlayerComponent extends Packet {
     private Component component;
     private String username;
 
-
     public PacketOutCloudPlayerComponent() {
         setPacketUUID(234893298);
     }

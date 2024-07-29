@@ -36,7 +36,7 @@ public class UUIDDriver {
     }
 
     @SneakyThrows
-    public static String getUserName(UUID uuid) {
+    public static String getUsername(UUID uuid) {
         if (UUIDS == null) UUIDS = new ArrayList<>();
 
         if (UUIDS.stream().anyMatch(uuidStorage -> uuidStorage.uuid().equals(uuid)))

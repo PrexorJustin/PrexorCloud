@@ -5,15 +5,15 @@ import me.prexorjustin.prexornetwork.cloud.networking.packet.NettyBuffer;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.Packet;
 
 @Getter
-public class PacketOutAPIPlayerDispatchCommand extends Packet {
+public class PacketInAPIPlayerDispatchCommand extends Packet {
 
     private String username, command;
 
-    public PacketOutAPIPlayerDispatchCommand() {
+    public PacketInAPIPlayerDispatchCommand() {
         setPacketUUID(984322181);
     }
 
-    public PacketOutAPIPlayerDispatchCommand(String userName, String command) {
+    public PacketInAPIPlayerDispatchCommand(String userName, String command) {
         setPacketUUID(984322181);
         this.username = userName;
         this.command = command;

@@ -23,5 +23,5 @@ public interface IGroupDriver {
 
     ArrayList<Group> getByNode(String node);
 
-    void update(String name, Group group);
+    void update(Group group);
 }

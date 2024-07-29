@@ -7,6 +7,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import me.prexorjustin.prexornetwork.cloud.driver.Driver;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
@@ -15,6 +17,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.configuration.dummys.manager.M
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.entry.RouteEntry;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.handle.RequestHandler;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class WebServer {
@@ -97,7 +100,7 @@ public class WebServer {
     }
 
     public void updateRoute(String path, String json) {
-        this.ROUTES.parallelStream().filter(routeEntry -> routeEntry.route.equalsIgnoreCase(path)).findFirst().get().channelUpdate(json);
+        Objects.requireNonNull(this.ROUTES.parallelStream().filter(routeEntry -> routeEntry.route.equalsIgnoreCase(path)).findFirst().orElse(null)).channelUpdate(json);
     }
 
     public void removeRoute(String path) {
@@ -109,5 +112,16 @@ public class WebServer {
         current.interrupt();
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public enum Routes {
+        GROUP("/cloudgroup/"),
+        GROUP_GENERAL(GROUP.route + "general"),
+        CLOUDSERVICE_GENERAL("/cloudservice/general"),
+        CLOUDSERVICE("/cloudservice/%servicename%");
+
+        private final String route;
     }
 }

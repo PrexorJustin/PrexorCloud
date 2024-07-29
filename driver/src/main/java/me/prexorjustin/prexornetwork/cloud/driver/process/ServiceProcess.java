@@ -34,8 +34,8 @@ public final class ServiceProcess implements IServiceProcess {
     private final boolean useProtocol;
     private final LinkedList<String> consoleStorage;
     private Process process;
-    private boolean useCustomTemplate;
-    private String customTemplate;
+    private final boolean useCustomTemplate;
+    private final String customTemplate;
     private boolean useVelocity, useConsole;
     private BufferedReader reader;
 
@@ -515,8 +515,6 @@ public final class ServiceProcess implements IServiceProcess {
         if (!this.group.isRunStatic()) {
             FileUtils.deleteDirectory(liveServiceLocation.toFile());
             liveServiceLocation.toFile().deleteOnExit();
-            if (FileUtils.isEmptyDirectory(liveGroupLocation.toFile()))
-                Files.delete(liveGroupLocation);
         } else {
             Path localServiceTemplate = Paths.get("./local/templates/" + group.getName() + "/" + service + "/");
 
@@ -527,10 +525,10 @@ public final class ServiceProcess implements IServiceProcess {
             Thread.sleep(500);
             FileUtils.deleteDirectory(liveServiceLocation.toFile());
             Thread.sleep(200);
-
-            if (FileUtils.isEmptyDirectory(liveGroupLocation.toFile()))
-                Files.delete(liveGroupLocation);
         }
+
+        if (FileUtils.isEmptyDirectory(liveGroupLocation.toFile()))
+            Files.delete(liveGroupLocation);
 
         Path liveLocation = Paths.get("./live/");
         if (FileUtils.isEmptyDirectory(liveLocation.toFile()))

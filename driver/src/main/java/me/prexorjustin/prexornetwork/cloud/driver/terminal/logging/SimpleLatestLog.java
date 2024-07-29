@@ -17,7 +17,7 @@ public class SimpleLatestLog {
     @SneakyThrows
     public SimpleLatestLog() {
         File logsDir = new File("./local/logs/");
-        if (!logsDir.exists()) logsDir.mkdir();
+        if (!logsDir.exists()) logsDir.mkdirs();
 
         if (new File(logsDir, "latest.log").exists()) {
             getAllLogs().stream().filter(s -> !s.equalsIgnoreCase("latest.log"))

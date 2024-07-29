@@ -2,6 +2,7 @@ package me.prexorjustin.prexornetwork.cloud.driver;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.prexorjustin.prexornetwork.cloud.driver.cloudplayer.offline.OfflinePlayerCacheDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.group.GroupDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.language.LanguageDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.module.ModuleDriver;
@@ -18,6 +19,8 @@ public class Driver {
     private final TemplateDriver templateDriver;
     private final GroupDriver groupDriver;
     private final ModuleDriver moduleDriver;
+    private OfflinePlayerCacheDriver offlinePlayerCacheDriver;
+
     private final MessageStorage messageStorage;
     @Setter
     private TerminalDriver terminalDriver;
@@ -35,5 +38,9 @@ public class Driver {
 
     public void runWebServer() {
         this.webServer = new WebServer();
+    }
+
+    public void initOfflinePlayerCacheDriver() {
+        this.offlinePlayerCacheDriver = new OfflinePlayerCacheDriver();
     }
 }

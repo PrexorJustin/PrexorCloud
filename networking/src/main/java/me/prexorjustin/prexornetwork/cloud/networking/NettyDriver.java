@@ -14,16 +14,17 @@ public class NettyDriver {
     @Getter
     private static NettyDriver instance;
     private final PacketDriver packetDriver;
-    private ArrayList<String> allowedAddresses;
+    private final ArrayList<String> allowedAddresses;
 
     @Setter
     private NettyClient nettyClient;
+    @Setter
     private NettyServer nettyServer;
 
     public NettyDriver() {
         instance = this;
 
         packetDriver = new PacketDriver();
-        nettyClient = new NettyClient();
+        this.allowedAddresses = new ArrayList<>();
     }
 }

@@ -12,12 +12,14 @@ import java.util.ArrayList;
 
 public class OfflinePlayerCacheDriver {
 
-    private final ConfigDriver configDriver = new ConfigDriver("./local/storage/cloudPlayer.storage");
+    private final ConfigDriver configDriver;
 
     public OfflinePlayerCacheDriver() {
+        this.configDriver = new ConfigDriver("./local/storage/cloudPlayer.storage");
+
         if (!this.configDriver.exists()) this.configDriver.save(new OfflinePlayerCacheConfiguration(new ArrayList<>()));
         else if (!this.configDriver.canBeRead(OfflinePlayerCacheConfiguration.class)) {
-            MigrateOfflinePlayerCacheConfiguration migration = ((MigrateOfflinePlayerCacheConfiguration) this.configDriver.read(MigrateOfflinePlayerCacheConfiguration.class));
+            MigrateOfflinePlayerCacheConfiguration migration = (MigrateOfflinePlayerCacheConfiguration) this.configDriver.read(MigrateOfflinePlayerCacheConfiguration.class);
             ArrayList<OfflinePlayerCache> offlinePlayerCaches = new ArrayList<>();
             migration.getPlayerCaches().forEach(migrateOfflinePlayer -> offlinePlayerCaches.add(new OfflinePlayerCache(
                     migrateOfflinePlayer.getName(),

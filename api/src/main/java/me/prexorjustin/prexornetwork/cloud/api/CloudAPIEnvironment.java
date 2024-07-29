@@ -13,6 +13,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.storage.uuid.UUIDDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.timer.TimerBase;
 import me.prexorjustin.prexornetwork.cloud.driver.timer.utils.TimeUtil;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.liveservice.LiveServiceList;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.liveservice.LiveServices;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.player.PlayerGeneral;
@@ -54,8 +55,8 @@ public class CloudAPIEnvironment {
             @Override
             public void run() {
                 CloudService service = CloudAPI.getInstance().getServicePool().getService(CloudAPI.getInstance().getService().getService());
-                LiveServiceList liveServiceList = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudservice/general"), LiveServiceList.class);
-                PlayerGeneral players = (PlayerGeneral) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudplayer/general"), PlayerGeneral.class);
+                LiveServiceList liveServiceList = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), LiveServiceList.class);
+                PlayerGeneral players = (PlayerGeneral) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), PlayerGeneral.class);
 
                 registerAllPlayerFromRestAPI();
 
@@ -71,10 +72,12 @@ public class CloudAPIEnvironment {
 
                 if (!NettyDriver.getInstance().getNettyClient().getChannel().isOpen()) System.exit(0);
 
-                LiveServices liveServices = (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudservice/" + service.getName().replace(liveServiceList.getCloudServiceSplitter(), "~")), LiveServices.class);
+                String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", service.getName().replace(liveServiceList.getCloudServiceSplitter(), "~"));
+
+                LiveServices liveServices = (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(route), LiveServices.class);
                 liveServices.setLastReaction(System.currentTimeMillis());
 
-                CloudAPI.getInstance().getRestDriver().update("/cloudservice/" + service.getName().replace(liveServiceList.getCloudServiceSplitter(), "~"), new ConfigDriver().convert(liveServices));
+                CloudAPI.getInstance().getRestDriver().update(route, new ConfigDriver().convert(liveServices));
             }
         }, 30, 30, TimeUtil.SECONDS);
     }

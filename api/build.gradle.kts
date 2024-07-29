@@ -1,3 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
 repositories {
     maven {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -22,12 +28,26 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.20-R0.1")
+
     compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-    implementation("net.kyori:adventure-api:4.17.0")
-    implementation("net.kyori:adventure-platform-bungeecord:4.3.3")
+
+    compileOnly("net.kyori:adventure-api:4.17.0")
+    compileOnly("net.kyori:adventure-platform-bungeecord:4.3.3")
+
     implementation("org.json:json:20240303")
 
     implementation(project(":driver"))
-    implementation(project(":networking"))
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("prexorcloud-api")
+        archiveVersion.set("")
+        archiveClassifier.set("")
+    }
+
+    named("build") {
+        dependsOn("shadowJar")
+    }
 }

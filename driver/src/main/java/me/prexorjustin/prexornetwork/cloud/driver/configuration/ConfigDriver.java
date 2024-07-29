@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 public class ConfigDriver {
 
     protected static final Gson GSON = (new GsonBuilder()).serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
-    private String location;
-    private ObjectMapper mapper;
+    private final String location;
+    private final ObjectMapper mapper;
 
     public ConfigDriver(String location) {
         this.location = location;
@@ -43,7 +43,7 @@ public class ConfigDriver {
 
     public boolean canBeRead(Class<? extends IConfigAdapter> tClass) {
         try {
-            Object object = this.mapper.readValue(new File(this.location), tClass);
+            this.mapper.readValue(new File(this.location), tClass);
             return true;
         } catch (Exception exception) {
             return false;

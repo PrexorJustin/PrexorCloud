@@ -6,6 +6,7 @@ import lombok.Setter;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.interfaces.IConfigAdapter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 @Getter
 @Setter
@@ -16,6 +17,6 @@ public class ManagerConfig implements IConfigAdapter {
     private boolean useProtocol, autoUpdate, showConnectingPlayers, copyLogs;
     private Integer processorUsage, serviceStartupCount, canUseMemory, bungeePort, spigotPort, networkingPort, restPort, timeoutCheck;
 
-    private ArrayList<String> whitelist;
+    private HashSet<String> whitelist;
     private ArrayList<ManagerConfigNodes> nodes;
 }

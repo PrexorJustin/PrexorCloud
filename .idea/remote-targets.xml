@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <option name="projectDefaultTargetUuid" value="dcafe3fe-2b12-42f2-b2a4-477b65c46369" />
+    <targets>
+      <target name="root@84.247.173.227:22" type="ssh/sftp" uuid="dcafe3fe-2b12-42f2-b2a4-477b65c46369">
+        <config>
+          <option name="projectRootOnTarget" value="/home/cloud" />
+          <option name="serverName" value="root@84.247.173.227:22 key" />
+        </config>
+        <ContributedStateBase type="JavaLanguageRuntime">
+          <config>
+            <option name="javaVersionString" value="22.0.2" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

@@ -44,7 +44,7 @@ public class TemplateDriver implements ITemplateDriver {
             }
         } else {
             Path templateLocation = Paths.get("./local/templates/" + template + "/");
-            Files.createDirectory(templateLocation);
+            Files.createDirectories(templateLocation);
             if (Files.exists(Paths.get("./service.json"))) {
                 ManagerConfig config = (ManagerConfig) new ConfigDriver("./service.json").read(ManagerConfig.class);
 
@@ -52,6 +52,7 @@ public class TemplateDriver implements ITemplateDriver {
                     Driver.getInstance().getMessageStorage().getPacketLoader().loadBungeecord(config.getBungeeVersion(), template + "/default");
                 else
                     Driver.getInstance().getMessageStorage().getPacketLoader().loadSpigot(config.getSpigotVersion(), template + "/default");
+
                 new AnimationDriver().play();
             } else {
                 NodeConfig config = (NodeConfig) new ConfigDriver("./nodeservice.json").read(NodeConfig.class);
