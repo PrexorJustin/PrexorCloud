@@ -15,7 +15,7 @@ public class HandleBungeePacketOutAPIPlayerKick implements NettyAdaptor {
         if (packet instanceof PacketOutAPIPlayerKick castedPacket) {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(castedPacket.getUsername());
             if (player.isConnected())
-                player.disconnect(TextComponent.fromLegacy(castedPacket.getMessage()));
+                player.disconnect(TextComponent.fromLegacyText(castedPacket.getMessage()));
         }
     }
 }

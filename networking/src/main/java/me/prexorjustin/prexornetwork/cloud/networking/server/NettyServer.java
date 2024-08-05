@@ -22,14 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NettyServer extends ChannelInitializer<Channel> implements AutoCloseable {
 
-    private int port;
     private final Map<String, Channel> CHANNELS = new ConcurrentHashMap<>();
-
-    private ChannelFuture channelFuture;
-
     EventLoopGroup BOSS;
     EventLoopGroup WORKER;
-
+    private int port;
+    private ChannelFuture channelFuture;
 
     public NettyServer bind(final int port) {
         this.port = port;
@@ -80,7 +77,7 @@ public class NettyServer extends ChannelInitializer<Channel> implements AutoClos
     }
 
     @Override
-    protected void initChannel(Channel channel) throws Exception {
+    protected void initChannel(Channel channel) {
         final InetSocketAddress inetSocketAddress = ((InetSocketAddress) channel.remoteAddress());
 
         if (isAddressAllowed(inetSocketAddress.getAddress().getHostAddress())) {

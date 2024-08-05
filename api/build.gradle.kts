@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("java-library")
 }
 
 repositories {
@@ -26,18 +27,18 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-20240729.211617-83")
     compileOnly("net.md-5:bungeecord-api:1.20-R0.1")
 
     compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
 
     compileOnly("net.kyori:adventure-api:4.17.0")
-    compileOnly("net.kyori:adventure-platform-bungeecord:4.3.3")
+    api("net.kyori:adventure-platform-bungeecord:4.3.3")
 
     implementation("org.json:json:20240303")
 
-    implementation(project(":driver"))
+    api(project(":driver"))
 }
 
 tasks {

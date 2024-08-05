@@ -34,9 +34,9 @@ import java.util.stream.IntStream;
 
 public class CloudServiceDriver implements ICloudServiceDriver {
 
-    private final ArrayDeque<TaskedService> services;
     public final ArrayDeque<String> delete;
     public final NetworkEntry entry;
+    private final ArrayDeque<TaskedService> services;
 
     public CloudServiceDriver() {
         this.entry = new NetworkEntry();
@@ -148,7 +148,6 @@ public class CloudServiceDriver implements ICloudServiceDriver {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
                         throw new RuntimeException(e);
                     }
                 }
@@ -169,7 +168,7 @@ public class CloudServiceDriver implements ICloudServiceDriver {
                     entry.setGlobalPlayersPotency(entry.getGlobalPlayers() / 100);
 
                     HashMap<String, Integer> groupPlayerPotency = groups.parallelStream()
-                            .map(group -> getServices(group.getGroupType()))
+                            .map(group -> getServices(group.getName()))
                             .flatMap(List::stream)
                             .filter(taskedService -> taskedService.getEntry().getCurrentPlayers() > 100)
                             .collect(
@@ -203,10 +202,10 @@ public class CloudServiceDriver implements ICloudServiceDriver {
 
                         services.forEach(taskedService -> {
                             Group group = Driver.getInstance().getGroupDriver().load(taskedService.getEntry().getGroupName());
-                            int online = (!entry.getGroupPlayerPotency().containsKey(group.getGroupType())) ? group.getMinOnline()
-                                    : (entry.getGroupPlayerPotency().get(group.getGroupType()) == 0 && entry.getGlobalPlayersPotency() == 0) ? group.getMinOnline()
+                            int online = (!entry.getGroupPlayerPotency().containsKey(group.getName())) ? group.getMinOnline()
+                                    : (entry.getGroupPlayerPotency().get(group.getName()) == 0 && entry.getGlobalPlayersPotency() == 0) ? group.getMinOnline()
                                     : (entry.getGlobalPlayersPotency() != 0) ? group.getOver100AtNetwork() * entry.getGlobalPlayersPotency()
-                                    : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getGroupType());
+                                    : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getName());
 
                             if (taskedService.hasStartedNew()) unregister(taskedService.getEntry().getServiceName());
                             if (getLobbiedServices(taskedService.getEntry().getGroupName()) - 1 >= online)
@@ -219,10 +218,10 @@ public class CloudServiceDriver implements ICloudServiceDriver {
 
                         lobbyServices.forEach(taskedService -> {
                             Group group = Driver.getInstance().getGroupDriver().load(taskedService.getEntry().getGroupName());
-                            int minOnline = (!entry.getGroupPlayerPotency().containsKey(group.getGroupType())) ? group.getMinOnline()
-                                    : (entry.getGroupPlayerPotency().get(group.getGroupType()) == 0 && entry.getGlobalPlayers() == 0) ? group.getMinOnline()
+                            int minOnline = (!entry.getGroupPlayerPotency().containsKey(group.getName())) ? group.getMinOnline()
+                                    : (entry.getGroupPlayerPotency().get(group.getName()) == 0 && entry.getGlobalPlayers() == 0) ? group.getMinOnline()
                                     : (entry.getGlobalPlayersPotency() != 0) ? group.getOver100AtNetwork() * entry.getGlobalPlayersPotency()
-                                    : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getGroupType());
+                                    : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getName());
 
                             int inStoppedQueue = PrexorCloudManager.queueDriver.getShutdownQueue().stream()
                                     .filter(s -> getService(s).getEntry().getGroupName().equalsIgnoreCase(taskedService.getEntry().getGroupName()))
@@ -283,26 +282,26 @@ public class CloudServiceDriver implements ICloudServiceDriver {
                     if (PrexorCloudManager.shutdown) cancel();
 
                     Driver.getInstance().getGroupDriver().getAll().stream()
-                            .filter(group -> (!entry.getGroupPlayerPotency().containsKey(group.getGroupType())) ? (getActiveServices(group.getGroupType()) < group.getMinOnline()) : ((entry.getGroupPlayerPotency().get(group.getGroupType()) == 0 && entry.getGlobalPlayersPotency() == 0) ? (getActiveServices(group.getGroupType()) < group.getMinOnline()) : ((entry.getGlobalPlayersPotency() != 0) ? (getActiveServices(group.getGroupType()) < group.getOver100AtNetwork() * entry.getGlobalPlayersPotency()) : (getActiveServices(group.getGroupType()) < group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getGroupType())))))
-                            .filter(group -> getServices(group.getGroupType()).size() + 1 <= Integer.parseInt(String.valueOf(group.getMaxOnline()).replace("-1", String.valueOf(Integer.MAX_VALUE))))
+                            .filter(group -> (!entry.getGroupPlayerPotency().containsKey(group.getName())) ? (getActiveServices(group.getName()) < group.getMinOnline()) : ((entry.getGroupPlayerPotency().get(group.getName()) == 0 && entry.getGlobalPlayersPotency() == 0) ? (getActiveServices(group.getName()) < group.getMinOnline()) : ((entry.getGlobalPlayersPotency() != 0) ? (getActiveServices(group.getName()) < group.getOver100AtNetwork() * entry.getGlobalPlayersPotency()) : (getActiveServices(group.getName()) < group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getName())))))
+                            .filter(group -> getServices(group.getName()).size() + 1 <= Integer.parseInt(String.valueOf(group.getMaxOnline()).replace("-1", String.valueOf(Integer.MAX_VALUE))))
                             .filter(group -> NettyDriver.getInstance().getNettyServer().isChannelRegistered(group.getStorage().getRunningNode()) || group.getStorage().getRunningNode().equals("InternalNode"))
                             .sorted(Comparator.comparingInt(Group::getStartPriority).reversed())
                             .forEach(group -> {
-                                int online = (!entry.getGroupPlayerPotency().containsKey(group.getGroupType())) ? group.getMinOnline() : (entry.getGroupPlayerPotency().get(group.getGroupType()) == 0 && entry.getGlobalPlayersPotency() == 0) ? group.getMinOnline() : (entry.getGlobalPlayersPotency() != 0) ? group.getOver100AtNetwork() * entry.getGlobalPlayersPotency() : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getGroupType());
-                                if (!delete.contains(group.getGroupType())) {
-                                    int minimal = online - getActiveServices(group.getGroupType());
+                                int online = (!entry.getGroupPlayerPotency().containsKey(group.getName())) ? group.getMinOnline() : (entry.getGroupPlayerPotency().get(group.getName()) == 0 && entry.getGlobalPlayersPotency() == 0) ? group.getMinOnline() : (entry.getGlobalPlayersPotency() != 0) ? group.getOver100AtNetwork() * entry.getGlobalPlayersPotency() : group.getOver100AtGroup() * entry.getGroupPlayerPotency().get(group.getName());
+                                if (!delete.contains(group.getName())) {
+                                    int minimal = online - getActiveServices(group.getName());
                                     for (int i = 0; i != minimal; i++) {
-                                        String id = PrexorCloudManager.config.getUuid().equals("INT") ? String.valueOf(PrexorCloudManager.serviceDriver.getFreeUUID(group.getGroupType())) : getFreeUUID();
-                                        String entryName = group.getGroupType() + PrexorCloudManager.config.getSplitter() + id;
+                                        String id = PrexorCloudManager.config.getUuid().equals("INT") ? String.valueOf(PrexorCloudManager.serviceDriver.getFreeUUID(group.getName())) : getFreeUUID();
+                                        String entryName = group.getName() + PrexorCloudManager.config.getSplitter() + id;
                                         String node = group.getStorage().getRunningNode();
                                         int freePort = getFreePort(group.getGroupType().equalsIgnoreCase("PROXY"));
                                         int memoryAfter = Driver.getInstance().getMessageStorage().getCanUseMemory() - group.getUsedMemory();
 
                                         if (node.equals("InternalNode") && memoryAfter >= 0) {
-                                            PrexorCloudManager.serviceDriver.register(new TaskedEntry(freePort, group.getGroupType(), entryName, node, PrexorCloudManager.config.isUseProtocol(), id, false, ""));
+                                            PrexorCloudManager.serviceDriver.register(new TaskedEntry(freePort, group.getName(), entryName, node, PrexorCloudManager.config.isUseProtocol(), id, false, ""));
                                             Driver.getInstance().getMessageStorage().setCanUseMemory(memoryAfter);
                                         } else if (!node.equals("InternalNode"))
-                                            PrexorCloudManager.serviceDriver.register(new TaskedEntry(-1, group.getGroupType(), entryName, node, PrexorCloudManager.config.isUseProtocol(), id, false, ""));
+                                            PrexorCloudManager.serviceDriver.register(new TaskedEntry(-1, group.getName(), entryName, node, PrexorCloudManager.config.isUseProtocol(), id, false, ""));
                                     }
                                 }
                             });
@@ -320,14 +319,16 @@ public class CloudServiceDriver implements ICloudServiceDriver {
                     if (!PrexorCloudManager.shutdown) {
                         PrexorCloudManager.serviceDriver.getServices().parallelStream().filter(taskedService -> taskedService.getEntry().getServiceState() != ServiceState.QUEUED && taskedService.getEntry().getServiceState() != ServiceState.STARTED).forEach(taskedService -> {
                             String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", taskedService.getEntry().getServiceName().replace(PrexorCloudManager.config.getSplitter(), "~"));
-                            if (Driver.getInstance().getWebServer().doesContentExist(route)) {
+
+                            if (Driver.getInstance().getWebServer().doesContentExist(Driver.getInstance().getWebServer().getRoute(route))) {
                                 LiveServices liveServices = (LiveServices) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(route), LiveServices.class);
                                 if (liveServices != null && liveServices.getLastReaction() != -1 && Integer.parseInt(String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - liveServices.getLastReaction()))) >= PrexorCloudManager.config.getTimeoutCheck()) {
                                     unregister(taskedService.getEntry().getServiceName());
                                 }
                             }
                         });
-                        PrexorCloudManager.serviceDriver.getServices().parallelStream().filter(taskedService -> taskedService.getEntry().getServiceState() != ServiceState.QUEUED && taskedService.getEntry().getServiceState() == ServiceState.STARTED).toList().forEach(taskedService -> {
+
+                        PrexorCloudManager.serviceDriver.getServices().parallelStream().filter(taskedService -> taskedService.getEntry().getServiceState() != ServiceState.QUEUED || taskedService.getEntry().getServiceState() == ServiceState.STARTED).toList().forEach(taskedService -> {
                             if (taskedService.getProcess() != null && taskedService.getProcess().getProcess() != null && !taskedService.getProcess().getProcess().isAlive()) {
                                 unregister(taskedService.getEntry().getServiceName());
                                 if (Driver.getInstance().getGroupDriver().load(taskedService.getEntry().getGroupName()).getGroupType().equalsIgnoreCase("PROXY")) {
@@ -356,7 +357,7 @@ public class CloudServiceDriver implements ICloudServiceDriver {
                                 .filter(taskedService -> taskedService.getEntry().getServiceState() != ServiceState.STARTED && taskedService.getEntry().getServiceState() != ServiceState.QUEUED)
                                 .forEach(taskedService -> NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(new PacketOutServiceConnected(taskedService.getEntry().getServiceName(), taskedService.getEntry().getGroupName())));
 
-                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                         general.getPlayers().forEach(s -> {
                             CloudPlayerRestCache restCech = (CloudPlayerRestCache) (PrexorCloudManager.restDriver.convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/" + s), CloudPlayerRestCache.class));
                             NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(new PacketOutPlayerConnect(UUIDDriver.getUsername(UUID.fromString(s)), restCech.getProxy()));

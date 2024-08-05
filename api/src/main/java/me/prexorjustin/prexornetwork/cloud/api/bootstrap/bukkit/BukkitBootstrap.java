@@ -6,13 +6,14 @@ import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.dummys.service.LiveService;
 import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.packets.in.service.PacketInServiceConnect;
+import me.prexorjustin.prexornetwork.cloud.networking.packet.packets.in.service.PacketInServiceDisconnect;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BukkitBootstrap extends JavaPlugin {
 
     @Override
-    public void onLoad() {
+    public void onEnable() {
         new CloudAPI();
 
         CloudAPIEnvironment apiEnvironment = new CloudAPIEnvironment();
@@ -25,6 +26,6 @@ public class BukkitBootstrap extends JavaPlugin {
     public void onDisable() {
         Bukkit.getOnlinePlayers().forEach(player -> player.kickPlayer("cloudservice-shutdown"));
         LiveService service = (LiveService) new ConfigDriver("./CLOUDSERVICE.json").read(LiveService.class);
-        NettyDriver.getInstance().getNettyClient().sendPacketsSynchronized(new PacketInServiceConnect(service.getService()));
+        NettyDriver.getInstance().getNettyClient().sendPacketsSynchronized(new PacketInServiceDisconnect(service.getName()));
     }
 }

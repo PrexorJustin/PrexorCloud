@@ -9,6 +9,7 @@
         </processorPath>
         <module name="cloud.driver.main" />
         <module name="cloud.api.test" />
+        <module name="cloud.plugin.test" />
         <module name="cloud.runnable.main" />
         <module name="cloud.runnable.manager.test" />
         <module name="cloud.driver.test" />
@@ -62,6 +63,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.kyori/option/1.0.0/59c5ae54c47ae294322ad979eaf7cdcde7ad0646/option-1.0.0.jar" />
         </processorPath>
         <module name="cloud.api.main" />
+        <module name="cloud.plugin.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="20" />

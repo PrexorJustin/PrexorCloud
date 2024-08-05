@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 
 public class HandleVelocityPacketOutAPIPlayerActionBar implements NettyAdaptor {
 
+
     @Override
     public void handle(Channel channel, Packet packet) {
         if (packet instanceof PacketOutAPIPlayerActionBar packetCast) {

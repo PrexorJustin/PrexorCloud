@@ -58,7 +58,7 @@ public abstract class ICloudService {
     }
 
     private LiveServices getLiveServices() {
-        LiveServiceList list = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()"), LiveServiceList.class);
+        LiveServiceList list = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), LiveServiceList.class);
         return (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", getName().replace(list.getCloudServiceSplitter(), "~"))), LiveServices.class);
     }
 

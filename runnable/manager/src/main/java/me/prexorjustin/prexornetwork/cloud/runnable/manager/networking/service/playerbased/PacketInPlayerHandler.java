@@ -13,6 +13,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.process.ServiceState;
 import me.prexorjustin.prexornetwork.cloud.driver.storage.uuid.UUIDDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.enums.Type;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.RestDriver;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.player.PlayerGeneral;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.entry.RouteEntry;
 import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
@@ -38,10 +39,10 @@ public class PacketInPlayerHandler implements NettyAdaptor {
             if (!PrexorCloudManager.shutdown) {
                 String service = packetCast.getProxy();
 
-                PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                 general.getPlayers().removeIf(s -> s.equalsIgnoreCase(UUIDDriver.getUUID(packetCast.getName()).toString()));
                 general.getPlayers().add(UUIDDriver.getUUID(packetCast.getName()).toString());
-                Driver.getInstance().getWebServer().updateRoute("/cloudplayer/general", new ConfigDriver().convert(general));
+                Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.PLAYER_GENERAL.getRoute(), new ConfigDriver().convert(general));
 
                 CloudPlayerRestCache cache = new CloudPlayerRestCache(packetCast.getName(), UUIDDriver.getUUID(packetCast.getName()).toString());
                 cache.handleConnect(service);
@@ -112,10 +113,10 @@ public class PacketInPlayerHandler implements NettyAdaptor {
                 }
             }
 
-            PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+            PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
             general.getPlayers().removeIf(s -> s.equalsIgnoreCase(UUIDDriver.getUUID(packetCast.getName()).toString()));
 
-            Driver.getInstance().getWebServer().updateRoute("/cloudplayer/general", new ConfigDriver().convert(general));
+            Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.PLAYER_GENERAL.getRoute(), new ConfigDriver().convert(general));
             Driver.getInstance().getMessageStorage().getEventDriver().executeEvent(new CloudPlayerDisconnectedEvent(packetCast.getName(), UUIDDriver.getUUID(packetCast.getName())));
 
             Driver.getInstance().getWebServer().removeRoute("/cloudplayer/" + UUIDDriver.getUUID(packetCast.getName()));
@@ -183,7 +184,7 @@ public class PacketInPlayerHandler implements NettyAdaptor {
 
                 Driver.getInstance().getOfflinePlayerCacheDriver().saveConfig(config);
             }
-        } else if(packet instanceof PacketInCloudPlayerComponent packetCast) {
+        } else if (packet instanceof PacketInCloudPlayerComponent packetCast) {
             NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(new PacketOutCloudPlayerComponent(packetCast.getComponent(), packetCast.getPlayer()));
         }
     }

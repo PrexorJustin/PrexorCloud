@@ -38,9 +38,9 @@ public class BungeeBootstrap extends Plugin {
 
     @Override
     public void onDisable() {
-        ProxyServer.getInstance().getPlayers().forEach(proxiedPlayer -> proxiedPlayer.disconnect(TextComponent.fromLegacy("cloudservice.shutdown")));
+        ProxyServer.getInstance().getPlayers().forEach(proxiedPlayer -> proxiedPlayer.disconnect(TextComponent.fromLegacyText("cloudservice.shutdown")));
 
         LiveService service = (LiveService) new ConfigDriver("./CLOUDSERVICE.json").read(LiveService.class);
-        NettyDriver.getInstance().getNettyClient().sendPacketsSynchronized(new PacketInServiceDisconnect(service.getService()));
+        NettyDriver.getInstance().getNettyClient().sendPacketsSynchronized(new PacketInServiceDisconnect(service.getName()));
     }
 }

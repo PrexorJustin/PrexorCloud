@@ -133,7 +133,7 @@ public class PrexorCloudBoot {
 
         if (!Files.exists(Paths.get("./dependency/"))) {
             Path folder = Paths.get("./dependency/");
-            Files.createDirectory(folder);
+            Files.createDirectories(folder);
             Files.setAttribute(folder, "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
         }
 

@@ -41,8 +41,8 @@ public class PacketInServiceHandler implements NettyAdaptor {
 
             PrexorCloudManager.serviceDriver.register(new TaskedEntry(
                     PrexorCloudManager.serviceDriver.getFreePort(group.getGroupType().equalsIgnoreCase("PROXY")),
-                    group.getGroupType(),
-                    group.getGroupType() + PrexorCloudManager.config.getSplitter() + id,
+                    group.getName(),
+                    group.getName() + PrexorCloudManager.config.getSplitter() + id,
                     group.getStorage().getRunningNode(),
                     PrexorCloudManager.config.isUseProtocol(),
                     id,
@@ -50,11 +50,13 @@ public class PacketInServiceHandler implements NettyAdaptor {
                     ""
             ));
         } else if (packet instanceof PacketInServiceConnect packetCast) {
-            if (PrexorCloudManager.serviceDriver.getService(packetCast.getService()) == null)
+            if (PrexorCloudManager.serviceDriver.getService(packetCast.getService()) == null) {
+                System.out.println("Disconnect 1 ");
                 channel.disconnect();
-            else if (NettyDriver.getInstance().getNettyServer().isChannelRegistered(packetCast.getService()))
+            } else if (NettyDriver.getInstance().getNettyServer().isChannelRegistered(packetCast.getService())) {
+                System.out.println("Disconnect 2 ");
                 channel.disconnect();
-            else {
+            } else {
                 NettyDriver.getInstance().getNettyServer().registerChannel(packetCast.getService(), channel);
                 TaskedEntry entry = PrexorCloudManager.serviceDriver.getService(packetCast.getService()).getEntry();
                 Group group = Driver.getInstance().getGroupDriver().load(entry.getGroupName());
@@ -66,7 +68,7 @@ public class PacketInServiceHandler implements NettyAdaptor {
                 );
 
                 if (group.getGroupType().equals("PROXY")) {
-                    NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(new PacketOutServiceConnected(packetCast.getService(), group.getGroupType()));
+                    NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(new PacketOutServiceConnected(packetCast.getService(), group.getName()));
 
                     new TimerBase().schedule(new TimerTask() {
                         @Override
@@ -83,12 +85,12 @@ public class PacketInServiceHandler implements NettyAdaptor {
                     Driver.getInstance().getMessageStorage().getEventDriver().executeEvent(new CloudProxyConnectedEvent(
                             packetCast.getService(),
                             entry.getTaskNode(),
-                            PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().get(0).getAddress(),
+                            PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().getFirst().getAddress(),
                             entry.getGroupName(),
                             entry.getUsedPort()
                     ));
                 } else {
-                    NettyDriver.getInstance().getNettyServer().sendToAllSynchronized(new PacketOutServiceConnected(packetCast.getService(), group.getGroupType()));
+                    NettyDriver.getInstance().getNettyServer().sendToAllSynchronized(new PacketOutServiceConnected(packetCast.getService(), group.getName()));
 
                     new TimerBase().schedule(new TimerTask() {
                         @Override
@@ -105,7 +107,7 @@ public class PacketInServiceHandler implements NettyAdaptor {
                     Driver.getInstance().getMessageStorage().getEventDriver().executeEvent(new CloudServiceConnectedEvent(
                             packetCast.getService(),
                             entry.getTaskNode(),
-                            PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().get(0).getAddress(),
+                            PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().getFirst().getAddress(),
                             entry.getGroupName(),
                             entry.getUsedPort()
                     ));

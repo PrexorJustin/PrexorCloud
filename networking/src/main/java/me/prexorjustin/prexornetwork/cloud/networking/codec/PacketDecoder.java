@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.NettyBuffer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class PacketDecoder extends ByteToMessageDecoder {
@@ -20,14 +19,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
         int packetUUID = byteBuf.readInt();
         var packetClass = NettyDriver.getInstance().getPacketDriver().getPacket(packetUUID);
         if (packetClass != null) {
-            try {
-                final var packet = packetClass.getDeclaredConstructor().newInstance();
-                packet.readPacket(new NettyBuffer(byteBuf));
-                list.add(packet);
-            } catch (InstantiationException | IllegalAccessError | InvocationTargetException |
-                     NoSuchMethodException exception) {
-                exception.printStackTrace();
-            }
+            final var packet = packetClass.getDeclaredConstructor().newInstance();
+            packet.readPacket(new NettyBuffer(byteBuf));
+            list.add(packet);
         }
     }
 }

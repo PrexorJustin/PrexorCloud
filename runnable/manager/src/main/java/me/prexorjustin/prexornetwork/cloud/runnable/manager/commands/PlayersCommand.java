@@ -9,6 +9,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.terminal.commands.CommandInfo;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.enums.Type;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.utils.TerminalStorageLine;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.RestDriver;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.player.PlayerGeneral;
 import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.packets.out.service.player.api.PacketOutAPIPlayerConnect;
@@ -29,7 +30,7 @@ public class PlayersCommand extends CommandAdapter {
 
             case 1 -> {
                 if (args[0].equalsIgnoreCase("list")) {
-                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                     if (!general.getPlayers().isEmpty()) {
                         ArrayList<String> sortedPlayers = general.getPlayers();
                         Collections.sort(sortedPlayers);
@@ -59,7 +60,7 @@ public class PlayersCommand extends CommandAdapter {
 
                 switch (args[0].toLowerCase()) {
                     case "op", "deop" -> {
-                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                         if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(UUIDDriver.getUUID(username)).toString()))) {
                             CloudPlayerRestCache player = (CloudPlayerRestCache) (new RestDriver()).convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/" + UUIDDriver.getUUID(username)), CloudPlayerRestCache.class);
                             PrexorCloudManager.serviceDriver.getService(player.getService()).handleExecute(
@@ -84,7 +85,7 @@ public class PlayersCommand extends CommandAdapter {
                     }
 
                     case "info" -> {
-                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                        PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                         if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(UUIDDriver.getUUID(args[0])).toString()))) {
                             CloudPlayerRestCache player = (CloudPlayerRestCache) (new RestDriver()).convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/" + UUIDDriver.getUUID(username)), CloudPlayerRestCache.class);
                             Driver.getInstance().getTerminalDriver().log(Type.COMMAND, "name: " + player.getName());
@@ -109,7 +110,7 @@ public class PlayersCommand extends CommandAdapter {
                 String username = args[1];
 
                 if (args[0].equalsIgnoreCase("send")) {
-                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                     if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(UUIDDriver.getUUID(username)).toString()))) {
                         String service = args[2];
                         if (PrexorCloudManager.serviceDriver.getService(service) != null) {
@@ -142,7 +143,7 @@ public class PlayersCommand extends CommandAdapter {
             default -> {
                 String username = args[1];
                 if (args[0].equalsIgnoreCase("sendMessage")) {
-                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                     if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(UUIDDriver.getUUID(username)).toString()))) {
                         CloudPlayerRestCache player = (CloudPlayerRestCache) (new RestDriver()).convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/" + UUIDDriver.getUUID(username)), CloudPlayerRestCache.class);
                         String message = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
@@ -161,7 +162,7 @@ public class PlayersCommand extends CommandAdapter {
 
                     }
                 } else if (args[0].equalsIgnoreCase("kick")) {
-                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                    PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                     if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(username))) {
                         CloudPlayerRestCache player = (CloudPlayerRestCache) (new RestDriver()).convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/" + UUIDDriver.getUUID(username)), CloudPlayerRestCache.class);
                         String message = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
@@ -196,7 +197,7 @@ public class PlayersCommand extends CommandAdapter {
             returns.add("connect");
         } else if (args.length == 1) {
             if (!args[0].equalsIgnoreCase("list")) {
-                PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                 general.getPlayers().forEach(s -> returns.add(UUIDDriver.getUsername(UUID.fromString(s))));
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("send")) {

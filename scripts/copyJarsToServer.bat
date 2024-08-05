@@ -1,0 +1,4 @@
+scp "D:\projects\me\prexorjustin\prexornetwork\cloud\api\build\libs\prexorcloud-api.jar" root@84.247.173.227:/var/www/html/cloud/download/prexorcloud-api.jar
+scp "D:\projects\me\prexorjustin\prexornetwork\cloud\runnable\manager\build\libs\runnable-manager.jar" root@84.247.173.227:/var/www/html/cloud/download/runnable-manager.jar
+scp "D:\projects\me\prexorjustin\prexornetwork\cloud\plugin\build\libs\prexorcloud-plugin.jar" root@84.247.173.227:/var/www/html/cloud/download/prexorcloud-plugin.jar
+scp "D:\projects\me\prexorjustin\prexornetwork\\cloud\launcher\build\libs\PrexorCloudLauncher.jar" root@84.247.173.227:/home/prexorcloud/PrexorCloudLauncher.jar

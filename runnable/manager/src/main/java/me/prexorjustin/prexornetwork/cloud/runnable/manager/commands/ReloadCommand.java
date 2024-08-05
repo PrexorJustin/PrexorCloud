@@ -10,6 +10,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.terminal.commands.CommandAdapt
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.commands.CommandInfo;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.enums.Type;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.utils.TerminalStorageLine;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.addresses.Addresses;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.group.GroupList;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.whitelist.Whitelist;
@@ -69,7 +70,7 @@ public class ReloadCommand extends CommandAdapter {
         Whitelist whitelistConfig = new Whitelist();
         PrexorCloudManager.config = (ManagerConfig) new ConfigDriver("./service.json").read(ManagerConfig.class);
         whitelistConfig.setWhitelist(PrexorCloudManager.config.getWhitelist());
-        Driver.getInstance().getWebServer().updateRoute("/default/whitelist", new ConfigDriver().convert(whitelistConfig));
+        Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.WHITELIST.getRoute(), new ConfigDriver().convert(whitelistConfig));
 
         Addresses AddressesConfig = new Addresses();
         ArrayList<String> addresses = PrexorCloudManager.config.getNodes().stream().map(ManagerConfigNodes::getAddress).collect(Collectors.toCollection(ArrayList::new));
@@ -78,7 +79,7 @@ public class ReloadCommand extends CommandAdapter {
 
         GroupList groupList = new GroupList();
         groupList.setGroups(Driver.getInstance().getGroupDriver().getAllStrings());
-        Driver.getInstance().getWebServer().updateRoute("/cloudgroup/general", new ConfigDriver().convert(groupList));
+        Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.GROUP_GENERAL.getRoute(), new ConfigDriver().convert(groupList));
 
         Driver.getInstance().getGroupDriver().getAll().forEach(group -> {
             if (Driver.getInstance().getWebServer().getRoute("/cloudgroup/" + group.getName()) == null) {

@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class NettyBuffer {
 
-    private final ByteBuf byteBuf;
     protected static final Gson GSON = (new GsonBuilder()).serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
+    private final ByteBuf byteBuf;
 
     public void writeString(String message) {
         byte[] bytes = message.getBytes(StandardCharsets.UTF_8);

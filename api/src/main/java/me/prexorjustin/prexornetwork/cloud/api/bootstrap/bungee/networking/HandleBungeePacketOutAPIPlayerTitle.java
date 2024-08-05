@@ -17,8 +17,8 @@ public class HandleBungeePacketOutAPIPlayerTitle implements NettyAdaptor {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(castedPacket.getUsername());
             if (player.isConnected()) {
                 Title title = ProxyServer.getInstance().createTitle();
-                title.title(TextComponent.fromLegacy(castedPacket.getTitle()));
-                title.subTitle(TextComponent.fromLegacy(castedPacket.getSubTitle()));
+                title.title(TextComponent.fromLegacyText(castedPacket.getTitle()));
+                title.subTitle(TextComponent.fromLegacyText(castedPacket.getSubTitle()));
                 title.fadeIn(castedPacket.getFadeIn());
                 title.stay(castedPacket.getStay());
                 title.fadeOut(castedPacket.getFadeOut());

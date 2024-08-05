@@ -23,7 +23,7 @@ public class TemplateDriver implements ITemplateDriver {
         if (isStatic) {
             Path templateLocation = Paths.get("./local/templates/" + template + "/default/");
             if (!Files.exists(templateLocation)) {
-                Files.createDirectory(templateLocation);
+                Files.createDirectories(templateLocation);
                 if (Files.exists(Paths.get("./service.json"))) {
                     ManagerConfig config = (ManagerConfig) new ConfigDriver("./service.json").read(ManagerConfig.class);
 

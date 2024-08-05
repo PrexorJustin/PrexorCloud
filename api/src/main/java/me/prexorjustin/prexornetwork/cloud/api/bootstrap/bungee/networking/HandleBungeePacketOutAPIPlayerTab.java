@@ -16,8 +16,8 @@ public class HandleBungeePacketOutAPIPlayerTab implements NettyAdaptor {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(castedPacket.getUsername());
             if (player.isConnected())
                 player.setTabHeader(
-                        TextComponent.fromLegacy(castedPacket.getHeader()),
-                        TextComponent.fromLegacy(castedPacket.getFooter())
+                        TextComponent.fromLegacyText(castedPacket.getHeader()),
+                        TextComponent.fromLegacyText(castedPacket.getFooter())
                 );
         }
     }

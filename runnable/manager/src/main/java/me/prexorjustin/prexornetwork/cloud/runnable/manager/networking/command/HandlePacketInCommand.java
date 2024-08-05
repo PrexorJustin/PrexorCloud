@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import me.prexorjustin.prexornetwork.cloud.driver.Driver;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.group.dummys.Group;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.whitelist.Whitelist;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.NettyAdaptor;
 import me.prexorjustin.prexornetwork.cloud.networking.packet.Packet;
@@ -50,7 +51,7 @@ public class HandlePacketInCommand implements NettyAdaptor {
             new ConfigDriver("./service.json").save(PrexorCloudManager.config);
             Whitelist whitelistConfig = new Whitelist();
             whitelistConfig.setWhitelist(PrexorCloudManager.config.getWhitelist());
-            Driver.getInstance().getWebServer().updateRoute("/default/whitelist", new ConfigDriver().convert(whitelistConfig));
+            Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.WHITELIST.getRoute(), new ConfigDriver().convert(whitelistConfig));
         }
     }
 }

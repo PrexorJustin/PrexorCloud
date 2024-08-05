@@ -10,8 +10,7 @@ dependencies {
     implementation("commons-io:commons-io:2.16.1")
     implementation("org.fusesource.jansi:jansi:2.4.1")
     implementation("nl.kyllian:PrivateBin-java:1.1-SNAPSHOT")
-    implementation("io.netty:netty-all:4.1.111.Final")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
 
-    api("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     api(project(":networking"))
 }

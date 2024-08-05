@@ -10,7 +10,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.configuration.interfaces.IConf
 @NoArgsConstructor
 public class LiveService implements IConfigAdapter {
 
-    private String service, group, managerAddress, runningNode;
+    private String name, group, managerAddress, runningNode;
     private Integer port, restPort, networkingPort;
 
 }

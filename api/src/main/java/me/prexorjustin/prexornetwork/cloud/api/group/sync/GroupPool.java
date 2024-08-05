@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import me.prexorjustin.prexornetwork.cloud.api.CloudAPI;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.group.dummys.Group;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.group.GroupList;
 
 import java.util.ArrayDeque;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 public class GroupPool {
 
     public GroupList getGroupList() {
-        return (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudgroup/general"), GroupList.class);
+        return (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.GROUP_GENERAL.getRoute()), GroupList.class);
     }
 
     public ArrayDeque<String> getGroupNames() {

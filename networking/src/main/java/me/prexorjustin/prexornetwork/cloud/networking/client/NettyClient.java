@@ -11,7 +11,6 @@ import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
-import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
 import me.prexorjustin.prexornetwork.cloud.networking.codec.PacketDecoder;
 import me.prexorjustin.prexornetwork.cloud.networking.codec.PacketEncoder;
 import me.prexorjustin.prexornetwork.cloud.networking.codec.PacketLengthDeserializer;
@@ -37,9 +36,7 @@ public class NettyClient extends ChannelInitializer<Channel> implements AutoClos
     }
 
     public void connect() {
-        boolean isEpoll = Epoll.isAvailable();
-
-        BOSS = isEpoll ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        BOSS = Epoll.isAvailable() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         try {
             this.channel = new Bootstrap()
@@ -70,10 +67,6 @@ public class NettyClient extends ChannelInitializer<Channel> implements AutoClos
                 .addLast("packet-length-serializer", new PacketLengthSerializer())
                 .addLast("packet-encoder", new PacketEncoder())
                 .addLast("worker", new NettyClientWorker());
-    }
-
-    private boolean isAddressAllowed(String address) {
-        return NettyDriver.getInstance().getAllowedAddresses().contains(address);
     }
 
     public void sendPacketSynchronized(Packet packet) {

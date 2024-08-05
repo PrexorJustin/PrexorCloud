@@ -1,6 +1,5 @@
 package me.prexorjustin.prexornetwork.cloud.runnable.manager.commands;
 
-import io.netty.handler.ssl.IdentityCipherSuiteFilter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.prexorjustin.prexornetwork.cloud.driver.Driver;
@@ -12,6 +11,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.terminal.commands.CommandAdapt
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.commands.CommandInfo;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.enums.Type;
 import me.prexorjustin.prexornetwork.cloud.driver.terminal.utils.TerminalStorageLine;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.player.PlayerGeneral;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.whitelist.Whitelist;
 import me.prexorjustin.prexornetwork.cloud.networking.NettyDriver;
@@ -215,14 +215,14 @@ public class ServiceCommand extends CommandAdapter {
                         new ConfigDriver("./service.json").save(PrexorCloudManager.config);
                         Whitelist whitelistConfig = new Whitelist();
                         whitelistConfig.setWhitelist(PrexorCloudManager.config.getWhitelist());
-                        Driver.getInstance().getWebServer().updateRoute("/default/whitelist", new ConfigDriver().convert(whitelistConfig));
+                        Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.WHITELIST.getRoute(), new ConfigDriver().convert(whitelistConfig));
                         Driver.getInstance().getTerminalDriver().log(
                                 Type.COMMAND, add ? Driver.getInstance().getLanguageDriver().getLanguage().getMessage("command-service-player-add-whitelist").replace("%player%", username)
                                         : Driver.getInstance().getLanguageDriver().getLanguage().getMessage("command-service-player-remove-whitelist").replace("%player%", username)
                         );
 
                         if (!add) {
-                            PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute("/cloudplayer/general"), PlayerGeneral.class);
+                            PlayerGeneral general = (PlayerGeneral) new ConfigDriver().convert(Driver.getInstance().getWebServer().getRoute(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
                             if (general.getPlayers().stream().anyMatch(s -> s.equalsIgnoreCase(username))) {
                                 NettyDriver.getInstance().getNettyServer().sendToAllAsynchronous(
                                         new PacketOutAPIPlayerKick(username, ((Messages) new ConfigDriver("./local/messages.json").read(Messages.class)).getMessages().get("kickNetworkIsMaintenance"))

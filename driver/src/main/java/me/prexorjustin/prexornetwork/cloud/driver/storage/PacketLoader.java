@@ -27,7 +27,6 @@ public final class PacketLoader {
     public void loadCloudAPI() {
         GeneralConfig updateConfig = (GeneralConfig) new ConfigDriver().convert(getHttpResponse(RestAPIEndpoints.GENERAL), GeneralConfig.class);
         String url = updateConfig.getConfig().get("cloud-api");
-        System.out.println(url);
         downloadFile(url, "./local/GLOBAL/EVERY/plugins/prexorcloud-api.jar");
     }
 

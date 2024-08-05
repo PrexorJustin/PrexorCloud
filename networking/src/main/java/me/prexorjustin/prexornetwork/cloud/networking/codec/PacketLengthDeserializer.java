@@ -12,43 +12,40 @@ public class PacketLengthDeserializer extends ByteToMessageDecoder {
     private final int byteSize = 5;
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        try {
-            if (!channelHandlerContext.channel().isActive()) {
-                byteBuf.skipBytes(byteBuf.readableBytes());
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
+        if (!channelHandlerContext.channel().isActive()) {
+            byteBuf.skipBytes(byteBuf.readableBytes());
+            return;
+        }
+        if (!byteBuf.isReadable()) return;
+
+        final var readerIndex = byteBuf.readerIndex();
+        final var bytes = new byte[this.byteSize];
+
+        for (var i = 0; i < this.byteSize; i++) {
+            if (!byteBuf.isReadable()) {
+                byteBuf.readerIndex(readerIndex);
                 return;
             }
-            if (!byteBuf.isReadable()) return;
 
-            final var readerIndex = byteBuf.readerIndex();
-            final var bytes = new byte[this.byteSize];
+            bytes[i] = byteBuf.readByte();
+            if (bytes[i] >= 0) {
+                final var buf = Unpooled.wrappedBuffer(bytes);
 
-            for (var i = 0; i < this.byteSize; ++i) {
-                if (!byteBuf.isReadable()) {
-                    byteBuf.readerIndex(readerIndex);
-                    return;
-                }
+                try {
+                    final var length = this.readVarIntUnchecked(buf);
 
-                bytes[i] = byteBuf.readByte();
-                if (bytes[i] >= 0) {
-                    final var buf = Unpooled.wrappedBuffer(bytes);
-
-                    try {
-                        final var length = this.readVarIntUnchecked(buf);
-
-                        if (byteBuf.readableBytes() < length) {
-                            byteBuf.readerIndex(readerIndex);
-                            return;
-                        }
-
-                        list.add(byteBuf.readBytes(length));
-                    } finally {
-                        buf.release();
+                    if (byteBuf.readableBytes() < length) {
+                        byteBuf.readerIndex(readerIndex);
+                        return;
                     }
+
+                    list.add(byteBuf.readBytes(length));
+                } finally {
+                    buf.release();
                 }
+                return;
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
         }
     }
 

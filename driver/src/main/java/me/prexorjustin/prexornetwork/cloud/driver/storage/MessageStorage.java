@@ -23,11 +23,12 @@ import java.util.LinkedList;
 public class MessageStorage {
 
     private final String version = "1.0";
+    private final PacketLoader packetLoader;
+    private final LinkedList<String> consoleInput;
     @Setter
     private Integer canUseMemory;
     @Setter
     private boolean shutdownAccept;
-    private final PacketLoader packetLoader;
     @Setter
     private EventDriver eventDriver;
     @Setter
@@ -38,11 +39,11 @@ public class MessageStorage {
     private boolean openServiceScreen;
     private boolean printConsoleToManager;
     private String printConsoleToManagerName;
-    private LinkedList<String> consoleInput;
 
     public MessageStorage() {
         this.packetLoader = new PacketLoader();
         this.eventDriver = new EventDriver();
+        this.consoleInput = new LinkedList<>();
         this.shutdownAccept = false;
         this.openServiceScreen = false;
         this.canUseMemory = 0;

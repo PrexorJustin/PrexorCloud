@@ -6,10 +6,6 @@ plugins {
 
 dependencies {
     compileOnly(project(":driver"))
-    compileOnly(project(":networking"))
-
-    compileOnly("io.netty:netty-all:4.1.111.Final")
-    compileOnly("net.kyori:adventure-api:4.17.0")
 }
 
 tasks {

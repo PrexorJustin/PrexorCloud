@@ -5,6 +5,7 @@ import me.prexorjustin.prexornetwork.cloud.driver.cloudplayer.offline.cached.Off
 import me.prexorjustin.prexornetwork.cloud.driver.cloudplayer.offline.cached.OfflinePlayerCacheConfiguration;
 import me.prexorjustin.prexornetwork.cloud.driver.cloudplayer.offline.migrate.MigrateOfflinePlayerCacheConfiguration;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.entry.RouteEntry;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class OfflinePlayerCacheDriver {
             this.configDriver.save(new OfflinePlayerCacheConfiguration(offlinePlayerCaches));
         }
 
-        Driver.getInstance().getWebServer().addRoute(new RouteEntry("/cloudplayer/offlinecache", this.configDriver.convert(readConfig())));
+        Driver.getInstance().getWebServer().addRoute(new RouteEntry(WebServer.Routes.PLAYER_OFFLINECACHE.getRoute(), this.configDriver.convert(readConfig())));
     }
 
     public OfflinePlayerCacheConfiguration readConfig() {
@@ -46,6 +47,6 @@ public class OfflinePlayerCacheDriver {
 
     public void saveConfig(OfflinePlayerCacheConfiguration cacheConfiguration) {
         this.configDriver.save(cacheConfiguration);
-        Driver.getInstance().getWebServer().updateRoute("/cloudplayer/offlinecache", this.configDriver.convert(cacheConfiguration));
+        Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.PLAYER_OFFLINECACHE.getRoute(), this.configDriver.convert(cacheConfiguration));
     }
 }

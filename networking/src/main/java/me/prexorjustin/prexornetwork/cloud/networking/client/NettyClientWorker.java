@@ -11,9 +11,4 @@ public class NettyClientWorker extends SimpleChannelInboundHandler<Packet> {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) throws Exception {
         NettyDriver.getInstance().getPacketDriver().call(packet.getPacketUUID(), channelHandlerContext.channel(), packet);
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
-    }
 }

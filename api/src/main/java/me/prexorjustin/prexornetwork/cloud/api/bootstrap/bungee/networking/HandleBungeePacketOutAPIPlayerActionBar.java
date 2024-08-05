@@ -16,7 +16,7 @@ public class HandleBungeePacketOutAPIPlayerActionBar implements NettyAdaptor {
         if (packet instanceof PacketOutAPIPlayerActionBar packetOutAPIPlayerActionBar) {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(packetOutAPIPlayerActionBar.getUsername());
             if (player.isConnected()) {
-                player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(packetOutAPIPlayerActionBar.getMessage()));
+                player.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(packetOutAPIPlayerActionBar.getMessage()));
             }
         }
     }

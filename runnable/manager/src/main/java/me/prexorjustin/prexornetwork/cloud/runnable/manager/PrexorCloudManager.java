@@ -60,6 +60,52 @@ public class PrexorCloudManager implements IRunAble {
     public static boolean shutdown;
     private static Timer timer;
 
+    public static void shutdownHook() {
+        NettyDriver.getInstance().getNettyServer().sendToAllSynchronized(new PacketOutShutdownNode());
+        Driver.getInstance().getModuleDriver().unload();
+        Driver.getInstance().getMessageStorage().getEventDriver().clearListeners();
+        NettyDriver.getInstance().getNettyServer().close();
+        serviceDriver.getServicesFromNode("InternalNode").forEach(TaskedService::handleQuit);
+        shutdown = true;
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+        }
+
+        Driver.getInstance().getWebServer().close();
+        Driver.getInstance().getTerminalDriver().log(Type.INFO, Driver.getInstance().getLanguageDriver().getLanguage().getMessage("cloud-shutting-down"));
+        System.exit(0);
+    }
+
+    public static void screenNode(String node) {
+        if (Driver.getInstance().getMessageStorage().isOpenServiceScreen()) {
+            timer.cancel();
+            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutDisableNodeConsole());
+            Driver.getInstance().getTerminalDriver().leaveSetup();
+        } else {
+            Driver.getInstance().getMessageStorage().setOpenServiceScreen(true);
+            Driver.getInstance().getMessageStorage().setScreenForm(node);
+            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutEnableNodeConsole());
+            Driver.getInstance().getTerminalDriver().clearScreen();
+
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!Driver.getInstance().getMessageStorage().getConsoleInput().isEmpty()) {
+                        String line = Driver.getInstance().getMessageStorage().getConsoleInput().removeFirst();
+                        if (line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("leave ")) {
+                            screenNode(Driver.getInstance().getMessageStorage().getScreenForm());
+                        } else {
+                            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutSendCommandToNodeConsole(line));
+                        }
+                    }
+                }
+            }, 100, 100);
+        }
+    }
+
     @Override
     public void run() {
         Driver.getInstance().getTerminalDriver().log(Type.INFO, Driver.getInstance().getLanguageDriver().getLanguage().getMessage("manager-try-start"));
@@ -127,7 +173,7 @@ public class PrexorCloudManager implements IRunAble {
         GroupList groupList = new GroupList();
         groupList.setGroups(Driver.getInstance().getGroupDriver().getAllStrings());
 
-        Driver.getInstance().getWebServer().addRoute(new RouteEntry("/cloudgroup/general", new ConfigDriver().convert(groupList)));
+        Driver.getInstance().getWebServer().addRoute(new RouteEntry(WebServer.Routes.GROUP_GENERAL.getRoute(), new ConfigDriver().convert(groupList)));
         Driver.getInstance().getGroupDriver().getAll().forEach(group -> {
             if (Driver.getInstance().getWebServer().getRoute("/cloudgroup/" + group.getName()) == null)
                 Driver.getInstance().getWebServer().addRoute(new RouteEntry("/cloudgroup/" + group.getName(), new ConfigDriver().convert(group)));
@@ -144,11 +190,11 @@ public class PrexorCloudManager implements IRunAble {
 
         Whitelist whitelistConfig = new Whitelist();
         whitelistConfig.setWhitelist(config.getWhitelist());
-        Driver.getInstance().getWebServer().addRoute(new RouteEntry("/default/whitelist", new ConfigDriver().convert(whitelistConfig)));
+        Driver.getInstance().getWebServer().addRoute(new RouteEntry(WebServer.Routes.WHITELIST.getRoute(), new ConfigDriver().convert(whitelistConfig)));
 
         PlayerGeneral general = new PlayerGeneral();
         general.setPlayers(new ArrayList<>());
-        Driver.getInstance().getWebServer().addRoute(new RouteEntry("/cloudplayer/general", new ConfigDriver().convert(general)));
+        Driver.getInstance().getWebServer().addRoute(new RouteEntry(WebServer.Routes.PLAYER_GENERAL.getRoute(), new ConfigDriver().convert(general)));
 
         Addresses AddressesConfig = new Addresses();
         ArrayList<String> addresses = new ArrayList<>();
@@ -163,24 +209,6 @@ public class PrexorCloudManager implements IRunAble {
         Driver.getInstance().getTerminalDriver().log(Type.INFO, Driver.getInstance().getLanguageDriver().getLanguage().getMessage("web-server-prepared"));
         Driver.getInstance().runWebServer();
         Driver.getInstance().getTerminalDriver().log(Type.INFO, Driver.getInstance().getLanguageDriver().getLanguage().getMessage("web-server-connected").replace("%port%", String.valueOf(config.getRestPort())));
-    }
-
-    public static void shutdownHook() {
-        NettyDriver.getInstance().getNettyServer().sendToAllSynchronized(new PacketOutShutdownNode());
-        Driver.getInstance().getModuleDriver().unload();
-        Driver.getInstance().getMessageStorage().getEventDriver().clearListeners();
-        NettyDriver.getInstance().getNettyServer().close();
-        serviceDriver.getServicesFromNode("InternalNode").forEach(TaskedService::handleQuit);
-        shutdown = true;
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException ignored) {
-        }
-
-        Driver.getInstance().getWebServer().close();
-        Driver.getInstance().getTerminalDriver().log(Type.INFO, Driver.getInstance().getLanguageDriver().getLanguage().getMessage("cloud-shutting-down"));
-        System.exit(0);
     }
 
     public void initNetty(ManagerConfig config) {
@@ -274,33 +302,5 @@ public class PrexorCloudManager implements IRunAble {
                 Driver.getInstance().getLanguageDriver().getLanguage().getMessage("commands-load-successfully")
                         .replace("%commands%", "" + Driver.getInstance().getTerminalDriver().getCommandDriver().getCommands().size())
         );
-    }
-
-    public static void screenNode(String node) {
-        if (Driver.getInstance().getMessageStorage().isOpenServiceScreen()) {
-            timer.cancel();
-            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutDisableNodeConsole());
-            Driver.getInstance().getTerminalDriver().leaveSetup();
-        } else {
-            Driver.getInstance().getMessageStorage().setOpenServiceScreen(true);
-            Driver.getInstance().getMessageStorage().setScreenForm(node);
-            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutEnableNodeConsole());
-            Driver.getInstance().getTerminalDriver().clearScreen();
-
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!Driver.getInstance().getMessageStorage().getConsoleInput().isEmpty()) {
-                        String line = Driver.getInstance().getMessageStorage().getConsoleInput().removeFirst();
-                        if (line.equalsIgnoreCase("leave") || line.equalsIgnoreCase("leave ")) {
-                            screenNode(Driver.getInstance().getMessageStorage().getScreenForm());
-                        } else {
-                            NettyDriver.getInstance().getNettyServer().sendPacketSynchronized(node, new PacketOutSendCommandToNodeConsole(line));
-                        }
-                    }
-                }
-            }, 100, 100);
-        }
     }
 }

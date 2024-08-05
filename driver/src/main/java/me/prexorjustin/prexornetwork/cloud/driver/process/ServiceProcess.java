@@ -33,9 +33,9 @@ public final class ServiceProcess implements IServiceProcess {
     private final int port;
     private final boolean useProtocol;
     private final LinkedList<String> consoleStorage;
-    private Process process;
     private final boolean useCustomTemplate;
     private final String customTemplate;
+    private Process process;
     private boolean useVelocity, useConsole;
     private BufferedReader reader;
 
@@ -121,7 +121,7 @@ public final class ServiceProcess implements IServiceProcess {
     @SneakyThrows
     @Override
     public void launch() {
-        if (this.process == null || this.port == 0 || this.service == null || this.group == null) return;
+        if (this.process != null || this.port == 0 || this.service == null || this.group == null) return;
 
         if (!Driver.getInstance().getTemplateDriver().get().contains(this.group.getStorage().getTemplate()))
             Driver.getInstance().getTemplateDriver().create(
@@ -130,15 +130,15 @@ public final class ServiceProcess implements IServiceProcess {
                     this.group.isRunStatic()
             );
 
-        Paths.get("./live/" + group.getName() + "/" + service + "/plugins/").toFile().mkdirs();
+        Files.createDirectories(Paths.get("./live/" + group.getName() + "/" + service + "/plugins/"));
 
         Path groupTemplateLocation = Paths.get("./local/templates/" + group.getName() + "/");
-        Path defaultTemplateLocation = Paths.get("./local/templates/" + group.getName() + "/default/");
+        Path defaultTemplateLocation = groupTemplateLocation.resolve("default");
 
         if (!this.useCustomTemplate) {
             if (this.group.isRunStatic()) {
                 if (!Files.exists(defaultTemplateLocation)) {
-                    defaultTemplateLocation.toFile().mkdirs();
+                    Files.createDirectories(defaultTemplateLocation);
 
                     try (Stream<Path> stream = Files.list(groupTemplateLocation)) {
                         stream.forEach(path -> {
@@ -166,12 +166,13 @@ public final class ServiceProcess implements IServiceProcess {
                         });
 
                         this.moveFiles(defaultTemplateLocation, groupTemplateLocation);
-                        defaultTemplateLocation.toFile().delete();
+                        Files.deleteIfExists(defaultTemplateLocation);
                     }
                 }
             }
         }
 
+        Path serviceTemplateLocation = groupTemplateLocation.resolve("/" + this.service + "/");
         Path serviceLiveDirectoryLocation = Paths.get("./live/" + group.getName() + "/" + service + "/");
 
         if (this.useCustomTemplate)
@@ -179,8 +180,8 @@ public final class ServiceProcess implements IServiceProcess {
         else if (!this.group.isRunStatic())
             Driver.getInstance().getTemplateDriver().copy(group.getStorage().getTemplate(), serviceLiveDirectoryLocation.toString());
         else {
-            if (Files.exists(groupTemplateLocation))
-                FileUtils.copyDirectory(groupTemplateLocation.toFile(), serviceLiveDirectoryLocation.toFile());
+            if (Files.exists(serviceTemplateLocation))
+                FileUtils.copyDirectory(serviceTemplateLocation.toFile(), serviceLiveDirectoryLocation.toFile());
             else
                 FileUtils.copyDirectory(defaultTemplateLocation.toFile(), serviceLiveDirectoryLocation.toFile());
         }
@@ -219,7 +220,7 @@ public final class ServiceProcess implements IServiceProcess {
         Path nodeServicePath = Paths.get("./nodeservice.json");
         LiveService liveService = new LiveService();
 
-        liveService.setService(this.service);
+        liveService.setName(this.service);
         liveService.setGroup(this.group.getName());
         liveService.setPort(this.port);
 
@@ -244,7 +245,7 @@ public final class ServiceProcess implements IServiceProcess {
         new ConfigDriver("./live/" + this.group.getName() + "/" + this.service + "/CLOUDSERVICE.json").save(liveService);
 
         FileUtils.copyDirectory(new File("./local/GLOBAL/EVERY"), serviceLiveDirectoryLocation.toFile());
-        FileUtils.copyFile(new File("./connection.key"), serviceLiveDirectoryLocation.resolve("/connection.key").toFile());
+        Files.copy(Paths.get("./connection.key"), serviceLiveDirectoryLocation.resolve("connection.key"));
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -260,7 +261,7 @@ public final class ServiceProcess implements IServiceProcess {
                     "-XX:+UseG1GC",
                     "-XX:G1HeapRegionSize=4M",
                     "-XX:+UnlockExperimentalVMOptions",
-                    "XX:+ParallelRefProcEnabled",
+                    "-XX:+ParallelRefProcEnabled",
                     "-XX:+AlwaysPreTouch",
                     "-XX:MaxInlineLevel=15",
                     "-XX:MaxGCPauseMillis=50",
@@ -301,36 +302,30 @@ public final class ServiceProcess implements IServiceProcess {
 
             if (this.group.getGroupType().equalsIgnoreCase("LOBBY"))
                 FileUtils.copyDirectory(new File("./local/GLOBAL/EVERY_LOBBY"), serviceLiveDirectoryLocation.toFile());
-
             String[] command = new String[]{
                     "java",
-                    "-Xms" + this.group.getUsedMemory() + "G",
-                    "-Xmx" + this.group.getUsedMemory() + "G",
-                    "-XX:+UseG1GC",
-                    "-XX:+ParallelRefProcEnabled",
-                    "-XX:MaxGCPauseMillis=200",
-                    "-XX:+UnlockExperimentalVMOptions",
-                    "-XX:+DisableExplicitGC",
+                    "-Xms" + this.group.getUsedMemory() + "M",
+                    "-Xmx" + this.group.getUsedMemory() + "M",
                     "-XX:+AlwaysPreTouch",
-                    "-XX:G1NewSizePercent=30",
-                    "XX:G1MaxNewSizePercent=40",
+                    "-XX:+DisableExplicitGC",
+                    "-XX:+ParallelRefProcEnabled",
+                    "-XX:+PerfDisableSharedMem",
+                    "-XX:+UnlockExperimentalVMOptions",
+                    "-XX:+UseG1GC",
                     "-XX:G1HeapRegionSize=8M",
-                    "-XX:G1ReservePercent=20",
                     "-XX:G1HeapWastePercent=5",
+                    "-XX:G1MaxNewSizePercent=40",
                     "-XX:G1MixedGCCountTarget=4",
-                    "-XX:InitiatingHeapOccupancyPercent=15",
                     "-XX:G1MixedGCLiveThresholdPercent=90",
-                    "Dio.netty.recycler.maxCapacity=0",
-                    "Dio.netty.recycler.maxCapacity.default=0",
-                    "XX:-UseAdaptiveSizePolicy",
-                    "Xx:+PerfDisableSharedMem",
+                    "-XX:G1NewSizePercent=30",
+                    "-XX:G1RSetUpdatingPauseTimePercent=5",
+                    "-XX:G1ReservePercent=20",
+                    "-XX:InitiatingHeapOccupancyPercent=15",
+                    "-XX:MaxGCPauseMillis=200",
                     "-XX:MaxTenuringThreshold=1",
-                    "-Dcom.mojang.eula.agree=true",
-                    "-Dio.netty.recycler.maxCapacity=0",
-                    "-Dio.netty.recycler.maxCapacity.default=0",
-                    "-Djline.terminal=jline.UnsupportedTerminal",
-                    "Dusing.aikars.flags=https://mcflags.emc.gs",
-                    "Daikars.new.flags=true",
+                    "-XX:SurvivorRatio=32",
+                    "-Dusing.aikars.flags=https://mcflags.emc.gs",
+                    "-Daikars.new.flags=true",
                     "-jar",
                     "server.jar",
                     "nogui",
@@ -351,6 +346,11 @@ public final class ServiceProcess implements IServiceProcess {
             Files.writeString(
                     serviceLiveDirectoryLocation.resolve("spigot.yml"),
                     Driver.getInstance().getMessageStorage().getSpigotYML(),
+                    StandardOpenOption.CREATE
+            );
+            Files.writeString(
+                    serviceLiveDirectoryLocation.resolve("eula.txt"),
+                    "eula=true",
                     StandardOpenOption.CREATE
             );
 
@@ -494,23 +494,28 @@ public final class ServiceProcess implements IServiceProcess {
         }
         Thread.sleep(500);
 
+        boolean copyLogs = false;
         Path serviceLogs = Paths.get("./local/logs/services/" + group.getName() + "/" + service + ".json");
         Path liveLogs = Paths.get("/live/" + group.getName() + "/" + service + "/logs/");
 
         if (Files.exists(Paths.get("./service.json"))) {
             ManagerConfig config = (ManagerConfig) new ConfigDriver("./service.json").read(ManagerConfig.class);
-            if (!config.isCopyLogs()) return;
+            copyLogs = config.isCopyLogs();
         } else {
             NodeConfig config = (NodeConfig) new ConfigDriver("./nodeservice.json").read(NodeConfig.class);
-            if (!config.isCopyLogs()) return;
+            copyLogs = config.isCopyLogs();
         }
 
-        Files.deleteIfExists(serviceLogs);
-        FileUtils.copyFile(liveLogs.resolve("latest.log").toFile(), serviceLogs.toFile());
+        if (copyLogs) {
+            Files.deleteIfExists(serviceLogs);
+            if (Files.exists(liveLogs)) {
+                Files.createDirectories(Paths.get("./local/logs/services/" + group.getName() + "/"));
+                Files.copy(liveLogs.resolve("latest.log"), serviceLogs);
+            }
+        }
 
         Path liveGroupLocation = Paths.get("./live/" + group.getName() + "/");
         Path liveServiceLocation = liveGroupLocation.resolve(this.service + "/");
-
 
         if (!this.group.isRunStatic()) {
             FileUtils.deleteDirectory(liveServiceLocation.toFile());
@@ -518,17 +523,17 @@ public final class ServiceProcess implements IServiceProcess {
         } else {
             Path localServiceTemplate = Paths.get("./local/templates/" + group.getName() + "/" + service + "/");
 
-            Files.delete(localServiceTemplate);
-            localServiceTemplate.toFile().mkdir();
+            FileUtils.deleteDirectory(localServiceTemplate.toFile());
+            Files.createDirectories(localServiceTemplate);
 
             FileUtils.copyDirectory(liveServiceLocation.toFile(), localServiceTemplate.toFile());
             Thread.sleep(500);
             FileUtils.deleteDirectory(liveServiceLocation.toFile());
             Thread.sleep(200);
-        }
 
-        if (FileUtils.isEmptyDirectory(liveGroupLocation.toFile()))
-            Files.delete(liveGroupLocation);
+            if (FileUtils.isEmptyDirectory(liveGroupLocation.toFile()))
+                Files.delete(liveGroupLocation);
+        }
 
         Path liveLocation = Paths.get("./live/");
         if (FileUtils.isEmptyDirectory(liveLocation.toFile()))

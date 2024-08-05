@@ -21,10 +21,9 @@ import java.util.UUID;
 @Getter
 public abstract class ICloudPlayer {
 
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private final String username;
     private final UUID uuid;
-
-    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
     public abstract ICloudService getProxyServer();
 

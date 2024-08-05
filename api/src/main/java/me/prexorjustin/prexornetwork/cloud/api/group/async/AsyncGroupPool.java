@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import me.prexorjustin.prexornetwork.cloud.api.CloudAPI;
 import me.prexorjustin.prexornetwork.cloud.driver.configuration.ConfigDriver;
 import me.prexorjustin.prexornetwork.cloud.driver.group.dummys.Group;
+import me.prexorjustin.prexornetwork.cloud.driver.webserver.WebServer;
 import me.prexorjustin.prexornetwork.cloud.driver.webserver.dummys.group.GroupList;
 
 import java.util.ArrayDeque;
@@ -15,13 +16,13 @@ import java.util.concurrent.ExecutionException;
 public class AsyncGroupPool {
 
     public CompletableFuture<ArrayDeque<String>> getGroupsByName() {
-        GroupList groupList = (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudgroup/general"), GroupList.class);
+        GroupList groupList = (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.GROUP_GENERAL.getRoute()), GroupList.class);
         return CompletableFuture.supplyAsync(groupList::getGroups);
     }
 
     public CompletableFuture<ArrayList<Group>> getGroups() {
         ArrayList<Group> groups = new ArrayList<>();
-        GroupList groupList = (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudgroup/general"), GroupList.class);
+        GroupList groupList = (GroupList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.GROUP_GENERAL.getRoute()), GroupList.class);
 
         groupList.getGroups().forEach(groupName -> groups.add((Group) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get("/cloudgroup/" + groupName), Group.class)));
 

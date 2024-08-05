@@ -1,0 +1,12 @@
+main: me.prexorjustin.prexornetwork.cloud.plugin.bukkit.BukkitBootstrap
+version: 1.0
+author: PrexorJustin
+name: PrexorCloudPlugin
+depend: [ "PrexorCloudAPI" ]
+api-version: '1.20'
+load: STARTUP
+
+commands:
+  service:
+
+  stop:

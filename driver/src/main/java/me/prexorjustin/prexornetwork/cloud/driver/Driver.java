@@ -19,9 +19,8 @@ public class Driver {
     private final TemplateDriver templateDriver;
     private final GroupDriver groupDriver;
     private final ModuleDriver moduleDriver;
-    private OfflinePlayerCacheDriver offlinePlayerCacheDriver;
-
     private final MessageStorage messageStorage;
+    private OfflinePlayerCacheDriver offlinePlayerCacheDriver;
     @Setter
     private TerminalDriver terminalDriver;
     @Setter

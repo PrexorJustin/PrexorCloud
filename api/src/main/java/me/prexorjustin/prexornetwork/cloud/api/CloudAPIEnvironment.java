@@ -49,14 +49,15 @@ public class CloudAPIEnvironment {
     }
 
     public void handleNettyUpdate() {
-        NettyDriver.getInstance().getNettyClient().sendPacketSynchronized(new PacketInServiceConnect(CloudAPI.getInstance().getService().getService()));
+        String serviceName = CloudAPI.getInstance().getService().getName();
+        NettyDriver.getInstance().getNettyClient().sendPacketSynchronized(new PacketInServiceConnect(serviceName));
 
         new TimerBase().scheduleAsync(new TimerTask() {
             @Override
             public void run() {
-                CloudService service = CloudAPI.getInstance().getServicePool().getService(CloudAPI.getInstance().getService().getService());
+                CloudService service = CloudAPI.getInstance().getServicePool().getService(serviceName);
                 LiveServiceList liveServiceList = (LiveServiceList) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), LiveServiceList.class);
-                PlayerGeneral players = (PlayerGeneral) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), PlayerGeneral.class);
+                PlayerGeneral players = (PlayerGeneral) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(WebServer.Routes.PLAYER_GENERAL.getRoute()), PlayerGeneral.class);
 
                 registerAllPlayerFromRestAPI();
 
@@ -72,7 +73,8 @@ public class CloudAPIEnvironment {
 
                 if (!NettyDriver.getInstance().getNettyClient().getChannel().isOpen()) System.exit(0);
 
-                String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", service.getName().replace(liveServiceList.getCloudServiceSplitter(), "~"));
+                String cloudServiceSplitter = liveServiceList.getCloudServiceSplitter();
+                String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", service.getName().replace(cloudServiceSplitter, "~"));
 
                 LiveServices liveServices = (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(route), LiveServices.class);
                 liveServices.setLastReaction(System.currentTimeMillis());

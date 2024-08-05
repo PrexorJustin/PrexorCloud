@@ -1,7 +1,7 @@
 package me.prexorjustin.prexornetwork.cloud.driver.configuration;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.SneakyThrows;
@@ -13,24 +13,23 @@ import java.util.concurrent.CompletableFuture;
 
 public class ConfigDriver {
 
-    protected static final Gson GSON = (new GsonBuilder()).serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
+    protected static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
     private final String location;
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public ConfigDriver(String location) {
         this.location = location;
-        this.mapper = new ObjectMapper();
+        this.mapper = JsonMapper.builder().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT).build();
     }
 
     public ConfigDriver() {
         this.location = "";
-        this.mapper = new ObjectMapper();
+        this.mapper = JsonMapper.builder().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT).build();
     }
 
     @SneakyThrows
     public IConfigAdapter read(Class<? extends IConfigAdapter> tClass) {
         try (InputStream inputStream = new FileInputStream(this.location)) {
-            this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return this.mapper.readValue(inputStream, tClass);
         } catch (IOException exception) {
             return null;

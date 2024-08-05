@@ -143,9 +143,7 @@ public class RestDriver {
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        if (response.statusCode() == 200) {
-            return response.body();
-        }
+        if (response.statusCode() == 200) return response.body();
 
         return null;
     }
@@ -179,20 +177,17 @@ public class RestDriver {
                 .build();
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
-        if (response.statusCode() == 200) {
-            return response.body();
-        }
+        if (response.statusCode() == 200) return response.body();
 
         return null;
     }
 
     private URI createAuthenticatedRouteURI(String route, RestMethod method) {
-        ConfigDriver configDriver = new ConfigDriver("./connection.key");
-        AuthenticatorKey authConfig = (AuthenticatorKey) configDriver.read(AuthenticatorKey.class);
+        AuthenticatorKey authConfig = (AuthenticatorKey) new ConfigDriver("./connection.key").read(AuthenticatorKey.class);
         String authCheckKey = Driver.getInstance().getMessageStorage().base64ToUTF8(authConfig.getKey());
 
         return switch (method) {
-            case POST, PUT -> URI.create(String.format("http://%s:%d/%s%s", this.ip, this.port, authCheckKey, route));
+            case POST, PUT -> URI.create(String.format("http://%s:%d/%s%s", ip, port, authCheckKey, route));
             case GET, DELETE -> URI.create("http://" + ip + ":" + port + "/" + authCheckKey + route);
         };
     }

@@ -63,8 +63,6 @@ public class TerminalDriver {
         this.simpleLatestLog = new SimpleLatestLog();
         this.inSetup = false;
 
-        //this.terminal = TerminalBuilder.terminal();
-
         this.lineReader = LineReaderBuilder.builder()
                 .terminal(this.terminal)
                 .completer(new TerminalCompleter())

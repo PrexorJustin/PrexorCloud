@@ -83,7 +83,7 @@ public class WebServer {
         if (ROUTES.parallelStream().noneMatch(routeEntry -> routeEntry.readROUTE().equalsIgnoreCase(path)))
             return null;
         else
-            return ROUTES.parallelStream().filter(routeEntry -> routeEntry.readROUTE().equalsIgnoreCase(path)).findFirst().get().channelRead();
+            return Objects.requireNonNull(ROUTES.parallelStream().filter(routeEntry -> routeEntry.readROUTE().equalsIgnoreCase(path)).findFirst().orElse(null)).channelRead();
     }
 
     public RouteEntry getRoutes(String path) {
@@ -117,10 +117,14 @@ public class WebServer {
     @RequiredArgsConstructor
     @Getter
     public enum Routes {
+        WHITELIST("/default/whitelist"),
         GROUP("/cloudgroup/"),
         GROUP_GENERAL(GROUP.route + "general"),
         CLOUDSERVICE_GENERAL("/cloudservice/general"),
-        CLOUDSERVICE("/cloudservice/%servicename%");
+        CLOUDSERVICE("/cloudservice/%servicename%"),
+        PLAYER_GENERAL("/cloudplayer/general"),
+        PLAYER_OFFLINECACHE("/cloudplayer/offlinecache"),
+        PLAYER("/cloudplayer/%playername%");
 
         private final String route;
     }

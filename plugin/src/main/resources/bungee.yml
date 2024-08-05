@@ -1,0 +1,5 @@
+main: me.prexorjustin.prexornetwork.cloud.plugin.bungeecord.BungeecordBootstrap
+version: 1.0
+author: PrexorJustin
+name: PrexorCloudPlugin
+depend: [ "PrexorCloudAPI" ]
