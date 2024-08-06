@@ -46,16 +46,17 @@ public class TaskedService implements ITaskedService {
         this.timer = new Timer();
         this.restAPIRoute = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", entry.getServiceName().replace(PrexorCloudManager.config.getSplitter(), "~"));
 
-        LiveServices liveServices = new LiveServices();
-        liveServices.setGroup(entry.getGroupName());
-        liveServices.setName(entry.getServiceName());
-        liveServices.setPlayers(0);
-        liveServices.setHost(PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().getFirst().getAddress());
-        liveServices.setNode(entry.getTaskNode());
-        liveServices.setPort(-1);
-        liveServices.setUuid(entry.getUseId());
-        liveServices.setState(ServiceState.QUEUED);
-        liveServices.setLastReaction(-1);
+        LiveServices liveServices = LiveServices.builder()
+                .group(entry.getGroupName())
+                .name(entry.getServiceName())
+                .players(0)
+                .host(PrexorCloudManager.config.getNodes().stream().filter(managerConfigNodes -> managerConfigNodes.getName().equals(entry.getTaskNode())).toList().getFirst().getAddress())
+                .node(entry.getTaskNode())
+                .port(-1)
+                .uuid(entry.getUseId())
+                .state(ServiceState.QUEUED)
+                .lastReaction(-1)
+                .build();
 
         LiveServiceList list = (LiveServiceList) new ConfigDriver().convert(PrexorCloudManager.restDriver.get(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute()), LiveServiceList.class);
         list.getCloudServices().add(entry.getServiceName());
@@ -63,9 +64,7 @@ public class TaskedService implements ITaskedService {
         Driver.getInstance().getWebServer().updateRoute(WebServer.Routes.CLOUDSERVICE_GENERAL.getRoute(), new ConfigDriver().convert(list));
 
         String convert = new ConfigDriver().convert(liveServices);
-        System.out.println("convert = " + convert);
-        Driver.getInstance().getWebServer().addRoute(new RouteEntry("/cloudservice/" + entry.getServiceName().replace(PrexorCloudManager.config.getSplitter(), "~"), convert));
-        //Driver.getInstance().getWebServer().addRoute(new RouteEntry(this.restAPIRoute, new ConfigDriver().convert(liveServices)));
+        Driver.getInstance().getWebServer().addRoute(new RouteEntry(this.restAPIRoute, convert));
 
         boolean proxy = Driver.getInstance().getGroupDriver().load(entry.getGroupName()).getGroupType().equals("PROXY");
         if (proxy)
@@ -115,7 +114,6 @@ public class TaskedService implements ITaskedService {
             liveServices.setPort(this.entry.getUsedPort());
 
             String convert = new ConfigDriver().convert(liveServices);
-            System.out.println("convert2 = " + convert);
             Driver.getInstance().getWebServer().updateRoute(this.restAPIRoute, convert);
 
             this.process = new ServiceProcess(
@@ -294,7 +292,6 @@ public class TaskedService implements ITaskedService {
         }
 
         String convert = new ConfigDriver().convert(liveServices);
-        System.out.println("convert3 = " + convert);
         Driver.getInstance().getWebServer().updateRoute(this.restAPIRoute, convert);
 
         if (status == ServiceState.IN_GAME) {

@@ -73,8 +73,7 @@ public class CloudAPIEnvironment {
 
                 if (!NettyDriver.getInstance().getNettyClient().getChannel().isOpen()) System.exit(0);
 
-                String cloudServiceSplitter = liveServiceList.getCloudServiceSplitter();
-                String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", service.getName().replace(cloudServiceSplitter, "~"));
+                String route = WebServer.Routes.CLOUDSERVICE.getRoute().replace("%servicename%", service.getName().replace(liveServiceList.getCloudServiceSplitter(), "~"));
 
                 LiveServices liveServices = (LiveServices) new ConfigDriver().convert(CloudAPI.getInstance().getRestDriver().get(route), LiveServices.class);
                 liveServices.setLastReaction(System.currentTimeMillis());
